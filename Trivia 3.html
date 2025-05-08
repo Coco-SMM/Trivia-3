@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rompecabezas - Trivia</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Raleway', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-300 via-purple-300 to-pink-300 flex items-center justify-center p-6">
+  <div id="app" class="backdrop-blur-md bg-white/10 p-8 rounded-2xl shadow-xl max-w-md w-full text-center animate__animated animate__fadeIn">
+    <h1 class="text-3xl font-bold text-white mb-4 animate__animated animate__fadeInDown">Rompecabezas - Trivia</h1>
+
+    <button id="startBtn" class="w-full p-3 rounded-xl text-white bg-green-500 hover:bg-green-600 transition-all shadow-lg transform hover:scale-105 mb-4">
+      Prueba tus conocimientos
+    </button>
+
+    <div id="questionBox" class="mt-6 text-white text-lg font-medium animate__animated hidden"></div>
+    <div id="optionsBox" class="mt-4 flex flex-col gap-2 hidden"></div>
+    <div id="feedback" class="mt-4 text-white font-bold text-xl hidden animate__animated"></div>
+    <button id="restartBtn" class="mt-6 hidden w-full p-2 rounded-xl text-white bg-blue-500 hover:bg-blue-600 transition-all">Reiniciar trivia</button>
+  </div>
+
+  <audio id="failSound" src="https://www.myinstants.com/media/sounds/wrong-answer-sound-effect.mp3"></audio>
+  <audio id="successSound" src="https://www.myinstants.com/media/sounds/correct.mp3"></audio>
+  <audio id="finalFanfarrias" src="https://www.myinstants.com/media/sounds/tada-fanfare.mp3"></audio>
+
+  <script>
+    const questionBox = document.getElementById('questionBox');
+    const optionsBox = document.getElementById('optionsBox');
+    const feedback = document.getElementById('feedback');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const failSound = document.getElementById('failSound');
+    const successSound = document.getElementById('successSound');
+    const finalFanfarrias = document.getElementById('finalFanfarrias');
+
+    const ideas = [
+      {
+        question: '¿Cuál es el planeta más grande del sistema solar?',
+        options: ['Tierra', 'Júpiter', 'Marte', 'Saturno'],
+        answer: 'Júpiter'
+      },
+      {
+        question: '¿Qué instrumento tiene teclas, cuerdas y martillos?',
+        options: ['Violín', 'Piano', 'Guitarra', 'Arpa'],
+        answer: 'Piano'
+      },
+      {
+        question: '¿Cuántos lados tiene un hexágono?',
+        options: ['5', '6', '7', '8'],
+        answer: '6'
+      },
+      {
+        question: '¿Cuál es la capital de Francia?',
+        options: ['Madrid', 'Berlín', 'París', 'Roma'],
+        answer: 'París'
+      },
+      {
+        question: '¿Qué gas respiramos que es esencial para vivir?',
+        options: ['Oxígeno', 'Hidrógeno', 'Dióxido de carbono', 'Helio'],
+        answer: 'Oxígeno'
+      },
+      {
+        question: '¿Quién pintó la Mona Lisa?',
+        options: ['Miguel Ángel', 'Leonardo da Vinci', 'Picasso', 'Van Gogh'],
+        answer: 'Leonardo da Vinci'
+      },
+      {
+        question: '¿Cuál es el océano más grande del mundo?',
+        options: ['Atlántico', 'Índico', 'Ártico', 'Pacífico'],
+        answer: 'Pacífico'
+      },
+      {
+        question: '¿En qué país se encuentra la Torre Eiffel?',
+        options: ['Italia', 'España', 'Francia', 'Alemania'],
+        answer: 'Francia'
+      }
+    ];
+
+    let currentQuestion = null;
+
+    function getRandomTrivia() {
+      return ideas[Math.floor(Math.random() * ideas.length)];
+    }
+
+    function displayTrivia() {
+      feedback.classList.add('hidden');
+      questionBox.classList.remove('hidden');
+      optionsBox.classList.remove('hidden');
+      restartBtn.classList.add('hidden');
+      currentQuestion = getRandomTrivia();
+      questionBox.textContent = currentQuestion.question;
+      questionBox.className = 'animate__animated animate__fadeInUp';
+
+      optionsBox.innerHTML = '';
+      currentQuestion.options.forEach(option => {
+        const btn = document.createElement('button');
+        btn.textContent = option;
+        btn.className = 'bg-white text-pink-600 font-semibold py-2 px-4 rounded-xl hover:bg-pink-100 transition-all';
+
+        btn.addEventListener('click', () => {
+          if (option === currentQuestion.answer) {
+            successSound.play();
+            feedback.textContent = '¡Correcto!';
+            feedback.className = 'text-green-400 animate__animated animate__fadeIn';
+            feedback.classList.remove('hidden');
+            setTimeout(() => {
+              displayTrivia();
+            }, 1000);
+          } else {
+            failSound.play();
+            feedback.textContent = '¡Incorrecto! Fin del juego';
+            feedback.className = 'text-red-500 animate__animated animate__shakeX';
+            feedback.classList.remove('hidden');
+            questionBox.textContent = '¡Gracias por jugar!';
+            optionsBox.innerHTML = '';
+            finalFanfarrias.play();
+            restartBtn.classList.remove('hidden');
+          }
+        });
+
+        optionsBox.appendChild(btn);
+      });
+    }
+
+    startBtn.addEventListener('click', () => {
+      startBtn.classList.add('hidden');
+      displayTrivia();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      feedback.classList.add('hidden');
+      restartBtn.classList.add('hidden');
+      displayTrivia();
+    });
+  </script>
+</body>
+</html>
